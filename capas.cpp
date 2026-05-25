@@ -1,246 +1,412 @@
+#ifndef CAPAS_CPP
+#define CAPAS_CPP
+
 #include <iostream>
 #include <fstream>
 #include <string>
-#include <cstdlib>
+#include <cctype>
+
 using namespace std;
 
-struct Pixel {
+struct NodoPixel {
     int x;
     int y;
     string color;
-    Pixel* siguiente;
+    NodoPixel* derecha;
+    NodoPixel* abajo;
+
+    NodoPixel(int px, int py, string pcolor) {
+        x = px;
+        y = py;
+        color = pcolor;
+        derecha = NULL;
+        abajo = NULL;
+    }
 };
 
-struct Capa {
+struct NodoEncabezado {
     int id;
-    Pixel* primero;
-    Capa* izquierda;
-    Capa* derecha;
+    NodoPixel* acceso;
+    NodoEncabezado* siguiente;
+
+    NodoEncabezado(int pid) {
+        id = pid;
+        acceso = NULL;
+        siguiente = NULL;
+    }
 };
 
-Capa* raizCapas = NULL;
+class ListaEncabezados {
+private:
+    NodoEncabezado* primero;
 
-string limpiarTexto(string texto) {
-    string nuevo = "";
-    for (int i = 0; i < texto.length(); i++) {
-        if (texto[i] != ' ' && texto[i] != '\t' && texto[i] != '\r' && texto[i] != '\n') {
-            nuevo += texto[i];
+public:
+    ListaEncabezados() {
+        primero = NULL;
+    }
+
+    NodoEncabezado* obtenerPrimero() {
+        return primero;
+    }
+
+    NodoEncabezado* buscar(int id) {
+        NodoEncabezado* actual = primero;
+
+        while (actual != NULL) {
+            if (actual->id == id) {
+                return actual;
+            }
+
+            actual = actual->siguiente;
         }
-    }
-    return nuevo;
-}
 
-Capa* crearCapa(int id) {
-    Capa* nueva = new Capa();
-    nueva->id = id;
-    nueva->primero = NULL;
-    nueva->izquierda = NULL;
-    nueva->derecha = NULL;
-    return nueva;
-}
-
-Pixel* crearPixel(int x, int y, string color) {
-    Pixel* nuevo = new Pixel();
-    nuevo->x = x;
-    nuevo->y = y;
-    nuevo->color = color;
-    nuevo->siguiente = NULL;
-    return nuevo;
-}
-
-void agregarPixel(Capa* capa, int x, int y, string color) {
-    if (capa == NULL) {
-        return;
-    }
-
-    Pixel* nuevo = crearPixel(x, y, color);
-
-    if (capa->primero == NULL) {
-        capa->primero = nuevo;
-    } else {
-        Pixel* aux = capa->primero;
-        while (aux->siguiente != NULL) {
-            aux = aux->siguiente;
-        }
-        aux->siguiente = nuevo;
-    }
-}
-
-Capa* insertarCapa(Capa* raiz, Capa* nueva) {
-    if (raiz == NULL) {
-        return nueva;
-    }
-
-    if (nueva->id < raiz->id) {
-        raiz->izquierda = insertarCapa(raiz->izquierda, nueva);
-    } else if (nueva->id > raiz->id) {
-        raiz->derecha = insertarCapa(raiz->derecha, nueva);
-    } else {
-        cout << "La capa " << nueva->id << " ya existe y no se agrego de nuevo.\n";
-    }
-
-    return raiz;
-}
-
-Capa* buscarCapa(Capa* raiz, int id) {
-    if (raiz == NULL) {
         return NULL;
     }
 
-    if (id == raiz->id) {
-        return raiz;
-    }
+    NodoEncabezado* insertar(int id) {
+        NodoEncabezado* encontrado = buscar(id);
 
-    if (id < raiz->id) {
-        return buscarCapa(raiz->izquierda, id);
-    } else {
-        return buscarCapa(raiz->derecha, id);
-    }
-}
-
-void mostrarPixeles(Capa* capa) {
-    if (capa == NULL) {
-        cout << "No existe la capa.\n";
-        return;
-    }
-
-    cout << "\nCapa: " << capa->id << "\n";
-    cout << "Pixeles guardados:\n";
-
-    Pixel* aux = capa->primero;
-
-    if (aux == NULL) {
-        cout << "La capa no tiene pixeles.\n";
-    }
-
-    while (aux != NULL) {
-        cout << "Fila: " << aux->y << "  Columna: " << aux->x << "  Color: " << aux->color << "\n";
-        aux = aux->siguiente;
-    }
-}
-
-void inorden(Capa* raiz) {
-    if (raiz != NULL) {
-        inorden(raiz->izquierda);
-        cout << "Capa " << raiz->id << "\n";
-        inorden(raiz->derecha);
-    }
-}
-
-int contarPixeles(Capa* capa) {
-    int contador = 0;
-    Pixel* aux = capa->primero;
-
-    while (aux != NULL) {
-        contador++;
-        aux = aux->siguiente;
-    }
-
-    return contador;
-}
-
-void resumenInorden(Capa* raiz) {
-    if (raiz != NULL) {
-        resumenInorden(raiz->izquierda);
-        cout << "Capa " << raiz->id << " - Pixeles: " << contarPixeles(raiz) << "\n";
-        resumenInorden(raiz->derecha);
-    }
-}
-
-void procesarPixel(string linea, Capa* capaActual) {
-    int pos1 = linea.find(',');
-    int pos2 = linea.find(',', pos1 + 1);
-    int pos3 = linea.find(';');
-
-    if (pos1 == -1 || pos2 == -1 || pos3 == -1) {
-        return;
-    }
-
-    string sx = linea.substr(0, pos1);
-    string sy = linea.substr(pos1 + 1, pos2 - pos1 - 1);
-    string color = linea.substr(pos2 + 1, pos3 - pos2 - 1);
-
-    int x = atoi(sx.c_str());
-    int y = atoi(sy.c_str());
-
-    agregarPixel(capaActual, x, y, color);
-}
-
-void cargarCapas() {
-    string ruta;
-    cout << "\nIngrese el nombre o ruta del archivo .cap: ";
-    getline(cin, ruta);
-
-    ifstream archivo(ruta.c_str());
-
-    if (!archivo.is_open()) {
-        cout << "\nNo se pudo abrir el archivo.\n";
-        return;
-    }
-
-    string linea;
-    Capa* capaActual = NULL;
-    int idAutomatico = 1;
-    int capasLeidas = 0;
-
-    while (getline(archivo, linea)) {
-        linea = limpiarTexto(linea);
-
-        if (linea.length() == 0) {
-            continue;
+        if (encontrado != NULL) {
+            return encontrado;
         }
 
-        int posicionLlave = linea.find('{');
+        NodoEncabezado* nuevo = new NodoEncabezado(id);
 
-        if (posicionLlave != -1) {
-            string textoId = linea.substr(0, posicionLlave);
-            int id = 0;
+        if (primero == NULL) {
+            primero = nuevo;
+            return nuevo;
+        }
 
-            if (textoId.length() == 0) {
-                id = idAutomatico;
-            } else {
-                id = atoi(textoId.c_str());
-            }
+        if (id < primero->id) {
+            nuevo->siguiente = primero;
+            primero = nuevo;
+            return nuevo;
+        }
 
-            capaActual = crearCapa(id);
-            raizCapas = insertarCapa(raizCapas, capaActual);
-            capasLeidas++;
-            idAutomatico = id + 1;
-        } else if (linea == "}") {
-            capaActual = NULL;
+        NodoEncabezado* actual = primero;
+
+        while (actual->siguiente != NULL && actual->siguiente->id < id) {
+            actual = actual->siguiente;
+        }
+
+        nuevo->siguiente = actual->siguiente;
+        actual->siguiente = nuevo;
+
+        return nuevo;
+    }
+};
+
+class MatrizDispersa {
+private:
+    ListaEncabezados filas;
+    ListaEncabezados columnas;
+    int maxX;
+    int maxY;
+
+public:
+    MatrizDispersa() {
+        maxX = 0;
+        maxY = 0;
+    }
+
+    int obtenerMaxX() {
+        return maxX;
+    }
+
+    int obtenerMaxY() {
+        return maxY;
+    }
+
+    void insertar(int x, int y, string color) {
+        NodoPixel* nuevo = new NodoPixel(x, y, color);
+
+        NodoEncabezado* fila = filas.insertar(y);
+        NodoEncabezado* columna = columnas.insertar(x);
+
+        if (fila->acceso == NULL) {
+            fila->acceso = nuevo;
+        } else if (x < fila->acceso->x) {
+            nuevo->derecha = fila->acceso;
+            fila->acceso = nuevo;
         } else {
-            if (capaActual != NULL) {
-                procesarPixel(linea, capaActual);
+            NodoPixel* actual = fila->acceso;
+
+            while (actual->derecha != NULL && actual->derecha->x < x) {
+                actual = actual->derecha;
             }
+
+            nuevo->derecha = actual->derecha;
+            actual->derecha = nuevo;
+        }
+
+        if (columna->acceso == NULL) {
+            columna->acceso = nuevo;
+        } else if (y < columna->acceso->y) {
+            nuevo->abajo = columna->acceso;
+            columna->acceso = nuevo;
+        } else {
+            NodoPixel* actual = columna->acceso;
+
+            while (actual->abajo != NULL && actual->abajo->y < y) {
+                actual = actual->abajo;
+            }
+
+            nuevo->abajo = actual->abajo;
+            actual->abajo = nuevo;
+        }
+
+        if (x > maxX) {
+            maxX = x;
+        }
+
+        if (y > maxY) {
+            maxY = y;
         }
     }
 
-    archivo.close();
+    int contarPixeles() {
+        int contador = 0;
+        NodoEncabezado* fila = filas.obtenerPrimero();
 
-    cout << "\nCarga de capas finalizada.\n";
-    cout << "Capas leidas del archivo: " << capasLeidas << "\n";
-}
+        while (fila != NULL) {
+            NodoPixel* pixel = fila->acceso;
 
-void mostrarCapas() {
-    cout << "\nCapas cargadas en el ABB:\n\n";
+            while (pixel != NULL) {
+                contador++;
+                pixel = pixel->derecha;
+            }
 
-    if (raizCapas == NULL) {
-        cout << "No hay capas cargadas.\n";
-    } else {
-        resumenInorden(raizCapas);
+            fila = fila->siguiente;
+        }
+
+        return contador;
     }
-}
 
-void buscarCapaMenu() {
+    void mostrarPixeles() {
+        NodoEncabezado* fila = filas.obtenerPrimero();
+
+        while (fila != NULL) {
+            NodoPixel* pixel = fila->acceso;
+
+            while (pixel != NULL) {
+                cout << "(" << pixel->x << "," << pixel->y << ") " << pixel->color << endl;
+                pixel = pixel->derecha;
+            }
+
+            fila = fila->siguiente;
+        }
+    }
+};
+
+struct NodoCapa {
     int id;
-    cout << "\nIngrese el id de la capa: ";
-    cin >> id;
+    MatrizDispersa matriz;
+    NodoCapa* izquierda;
+    NodoCapa* derecha;
 
-    Capa* encontrada = buscarCapa(raizCapas, id);
-
-    if (encontrada == NULL) {
-        cout << "\nNo se encontro la capa.\n";
-    } else {
-        mostrarPixeles(encontrada);
+    NodoCapa(int pid) {
+        id = pid;
+        izquierda = NULL;
+        derecha = NULL;
     }
-}
+};
+
+class ArbolCapas {
+private:
+    NodoCapa* raiz;
+
+    NodoCapa* insertarRecursivo(NodoCapa* actual, int id) {
+        if (actual == NULL) {
+            actual = new NodoCapa(id);
+            return actual;
+        }
+
+        if (id < actual->id) {
+            actual->izquierda = insertarRecursivo(actual->izquierda, id);
+        } else if (id > actual->id) {
+            actual->derecha = insertarRecursivo(actual->derecha, id);
+        }
+
+        return actual;
+    }
+
+    NodoCapa* buscarRecursivo(NodoCapa* actual, int id) {
+        if (actual == NULL) {
+            return NULL;
+        }
+
+        if (actual->id == id) {
+            return actual;
+        }
+
+        if (id < actual->id) {
+            return buscarRecursivo(actual->izquierda, id);
+        } else {
+            return buscarRecursivo(actual->derecha, id);
+        }
+    }
+
+    void mostrarInordenRecursivo(NodoCapa* actual) {
+        if (actual != NULL) {
+            mostrarInordenRecursivo(actual->izquierda);
+            cout << "Capa " << actual->id << " - Pixeles: " << actual->matriz.contarPixeles() << endl;
+            mostrarInordenRecursivo(actual->derecha);
+        }
+    }
+
+    void saltarEspacios(string texto, int& i) {
+        while (i < texto.length() && isspace(texto[i])) {
+            i++;
+        }
+    }
+
+    int leerNumero(string texto, int& i) {
+        int numero = 0;
+
+        while (i < texto.length() && isdigit(texto[i])) {
+            numero = numero * 10 + (texto[i] - '0');
+            i++;
+        }
+
+        return numero;
+    }
+
+    string leerColor(string texto, int& i) {
+        string color = "";
+
+        while (i < texto.length() && texto[i] != ';' && texto[i] != '\n' && texto[i] != '\r') {
+            if (!isspace(texto[i]) && texto[i] != ',') {
+                color += texto[i];
+            }
+
+            i++;
+        }
+
+        return color;
+    }
+
+public:
+    ArbolCapas() {
+        raiz = NULL;
+    }
+
+    void insertar(int id) {
+        raiz = insertarRecursivo(raiz, id);
+    }
+
+    NodoCapa* buscar(int id) {
+        return buscarRecursivo(raiz, id);
+    }
+
+    void mostrarInorden() {
+        if (raiz == NULL) {
+            cout << "No hay capas cargadas." << endl;
+        } else {
+            mostrarInordenRecursivo(raiz);
+        }
+    }
+
+    bool cargarArchivo(string ruta) {
+        ifstream archivo(ruta.c_str());
+
+        if (!archivo.is_open()) {
+            return false;
+        }
+
+        string texto = "";
+        string linea = "";
+
+        while (getline(archivo, linea)) {
+            texto += linea;
+            texto += "\n";
+        }
+
+        archivo.close();
+
+        int i = 0;
+        int idAutomatico = 1;
+
+        while (i < texto.length()) {
+            saltarEspacios(texto, i);
+
+            if (i >= texto.length()) {
+                break;
+            }
+
+            int idCapa = 0;
+
+            if (isdigit(texto[i])) {
+                idCapa = leerNumero(texto, i);
+            } else if (texto[i] == '{') {
+                idCapa = idAutomatico;
+            } else {
+                i++;
+                continue;
+            }
+
+            saltarEspacios(texto, i);
+
+            if (i < texto.length() && texto[i] == '{') {
+                i++;
+                insertar(idCapa);
+                NodoCapa* capaActual = buscar(idCapa);
+
+                if (idCapa >= idAutomatico) {
+                    idAutomatico = idCapa + 1;
+                }
+
+                while (i < texto.length() && texto[i] != '}') {
+                    saltarEspacios(texto, i);
+
+                    if (i < texto.length() && texto[i] == '}') {
+                        break;
+                    }
+
+                    if (i < texto.length() && isdigit(texto[i])) {
+                        int x = leerNumero(texto, i);
+
+                        saltarEspacios(texto, i);
+
+                        if (i < texto.length() && texto[i] == ',') {
+                            i++;
+                        }
+
+                        saltarEspacios(texto, i);
+
+                        int y = leerNumero(texto, i);
+
+                        saltarEspacios(texto, i);
+
+                        if (i < texto.length() && texto[i] == ',') {
+                            i++;
+                        }
+
+                        saltarEspacios(texto, i);
+
+                        string color = leerColor(texto, i);
+
+                        if (i < texto.length() && texto[i] == ';') {
+                            i++;
+                        }
+
+                        if (capaActual != NULL && color != "") {
+                            capaActual->matriz.insertar(x, y, color);
+                        }
+                    } else {
+                        i++;
+                    }
+                }
+
+                if (i < texto.length() && texto[i] == '}') {
+                    i++;
+                }
+            } else {
+                i++;
+            }
+        }
+
+        return true;
+    }
+};
+
+#endif
