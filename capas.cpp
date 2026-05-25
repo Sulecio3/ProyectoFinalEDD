@@ -5,6 +5,7 @@
 #include <fstream>
 #include <string>
 #include <cctype>
+#include <cstdlib>
 
 using namespace std;
 
@@ -195,6 +196,26 @@ public:
 
             fila = fila->siguiente;
         }
+    }
+
+    string obtenerColor(int x, int y) {
+        NodoEncabezado* fila = filas.buscar(y);
+
+        if (fila == NULL) {
+            return "#FFFFFF";
+        }
+
+        NodoPixel* pixel = fila->acceso;
+
+        while (pixel != NULL) {
+            if (pixel->x == x) {
+                return pixel->color;
+            }
+
+            pixel = pixel->derecha;
+        }
+
+        return "#FFFFFF";
     }
 };
 
@@ -403,6 +424,61 @@ public:
             } else {
                 i++;
             }
+        }
+
+        return true;
+    }
+
+    bool generarImagenCapa(int id) {
+        NodoCapa* capa = buscar(id);
+
+        if (capa == NULL) {
+            return false;
+        }
+
+        int ancho = capa->matriz.obtenerMaxX();
+        int alto = capa->matriz.obtenerMaxY();
+
+        if (ancho <= 0 || alto <= 0) {
+            return false;
+        }
+
+        string nombreDot = "capa_" + to_string(id) + ".dot";
+        string nombrePng = "capa_" + to_string(id) + ".png";
+
+        ofstream archivo(nombreDot.c_str());
+
+        if (!archivo.is_open()) {
+            return false;
+        }
+
+        archivo << "digraph G {" << endl;
+        archivo << "node [shape=plain]" << endl;
+        archivo << "tabla [label=<" << endl;
+        archivo << "<TABLE BORDER=\"0\" CELLBORDER=\"1\" CELLSPACING=\"0\">" << endl;
+
+        for (int y = 1; y <= alto; y++) {
+            archivo << "<TR>" << endl;
+
+            for (int x = 1; x <= ancho; x++) {
+                string color = capa->matriz.obtenerColor(x, y);
+                archivo << "<TD WIDTH=\"25\" HEIGHT=\"25\" BGCOLOR=\"" << color << "\"></TD>" << endl;
+            }
+
+            archivo << "</TR>" << endl;
+        }
+
+        archivo << "</TABLE>" << endl;
+        archivo << ">];" << endl;
+        archivo << "}" << endl;
+        archivo.close();
+
+        string comando = "dot -Tpng \"" + nombreDot + "\" -o \"" + nombrePng + "\"";
+        int resultado = system(comando.c_str());
+
+        if (resultado != 0) {
+            cout << "Se creo el archivo .dot, pero Graphviz no genero el .png." << endl;
+            cout << "Revise que Graphviz este instalado y agregado al PATH." << endl;
         }
 
         return true;

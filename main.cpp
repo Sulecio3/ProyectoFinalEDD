@@ -25,6 +25,7 @@ int main() {
         cout << "7. Cargar usuarios" << endl;
         cout << "8. Ver usuarios cargados" << endl;
         cout << "9. Ver detalle de un usuario" << endl;
+        cout << "10. Generar imagen por capa" << endl;
         cout << "0. Salir" << endl;
         cout << "Seleccione una opcion: ";
         cin >> opcion;
@@ -96,10 +97,21 @@ int main() {
             cout << "Ingrese el nombre del usuario: ";
             cin >> nombre;
             arbolUsuarios.mostrarDetalleUsuario(nombre);
+        } else if (opcion == 10) {
+            int id;
+            cout << "Ingrese el id de la capa a generar: ";
+            cin >> id;
+
+            if (arbolCapas.generarImagenCapa(id)) {
+                cout << "Imagen generada correctamente." << endl;
+                cout << "Revise los archivos capa_" << id << ".dot y capa_" << id << ".png" << endl;
+            } else {
+                cout << "No se pudo generar la imagen." << endl;
+            }
         } else if (opcion == 0) {
-            cout << "Saliendo del programa..." << endl;
+            cout << "Saliendo del programa" << endl;
         } else {
-            cout << "Opcion invalida." << endl;
+            cout << "Opcion no valida :( intente de nuevo" << endl;
         }
     }
 
