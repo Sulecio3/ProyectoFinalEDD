@@ -1,219 +1,83 @@
 #include <iostream>
-#include <string>
-
+#include <cstdlib>
 using namespace std;
 
-int main()
-{
-    int opcion = -1;
-    int opcionGenerar = -1;
-    int opcionCrud = -1;
-    int opcionReportes = -1;
+void cargarCapas();
+void mostrarCapas();
+void buscarCapaMenu();
 
-    while (opcion != 0)
-    {
-        cout << "=====================================" << endl;
-        cout << " GENERADOR DE IMAGENES POR CAPAS" << endl;
-        cout << "=====================================" << endl;
-        cout << "1. Carga masiva de capas" << endl;
-        cout << "2. Carga masiva de imagenes" << endl;
-        cout << "3. Carga masiva de usuarios" << endl;
-        cout << "4. Generacion de imagenes" << endl;
-        cout << "5. CRUD" << endl;
-        cout << "6. Estado de la memoria" << endl;
-        cout << "0. Salir" << endl;
-        cout << "Ingrese una opcion: ";
+void pausar() {
+    cout << "\nPresione ENTER para continuar...";
+    cin.ignore();
+    cin.get();
+}
+
+void limpiar() {
+    system("cls");
+}
+
+int main() {
+    int opcion = 0;
+
+    do {
+        limpiar();
+        cout << "====================================\n";
+        cout << "   GENERADOR DE IMAGENES POR CAPAS\n";
+        cout << "====================================\n";
+        cout << "1. Carga masiva de capas\n";
+        cout << "2. Ver capas cargadas\n";
+        cout << "3. Buscar y ver una capa\n";
+        cout << "4. Carga masiva de imagenes\n";
+        cout << "5. Carga masiva de usuarios\n";
+        cout << "6. Generar imagen\n";
+        cout << "7. Reportes\n";
+        cout << "8. CRUD\n";
+        cout << "9. Salir\n";
+        cout << "====================================\n";
+        cout << "Seleccione una opcion: ";
         cin >> opcion;
 
-        if (opcion == 1)
-        {
-            cout << endl;
-            cout << "Carga masiva de capas pendiente." << endl;
-            cout << endl;
+        if (opcion == 1) {
+            cin.ignore();
+            cargarCapas();
+            pausar();
+        } else if (opcion == 2) {
+            cin.ignore();
+            mostrarCapas();
+            pausar();
+        } else if (opcion == 3) {
+            cin.ignore();
+            buscarCapaMenu();
+            pausar();
+        } else if (opcion == 4) {
+            cin.ignore();
+            cout << "\nEsta opcion se trabajara en el siguiente commit.\n";
+            pausar();
+        } else if (opcion == 5) {
+            cin.ignore();
+            cout << "\nEsta opcion se trabajara mas adelante.\n";
+            pausar();
+        } else if (opcion == 6) {
+            cin.ignore();
+            cout << "\nEsta opcion se trabajara mas adelante.\n";
+            pausar();
+        } else if (opcion == 7) {
+            cin.ignore();
+            cout << "\nEsta opcion se trabajara mas adelante.\n";
+            pausar();
+        } else if (opcion == 8) {
+            cin.ignore();
+            cout << "\nEsta opcion se trabajara mas adelante.\n";
+            pausar();
+        } else if (opcion == 9) {
+            cout << "\nSaliendo del programa...\n";
+        } else {
+            cin.ignore();
+            cout << "\nOpcion no valida :( intente de nuevo\n";
+            pausar();
         }
-        else if (opcion == 2)
-        {
-            cout << endl;
-            cout << "Carga masiva de imagenes pendiente." << endl;
-            cout << endl;
-        }
-        else if (opcion == 3)
-        {
-            cout << endl;
-            cout << "Carga masiva de usuarios pendiente." << endl;
-            cout << endl;
-        }
-        else if (opcion == 4)
-        {
-            opcionGenerar = -1;
 
-            while (opcionGenerar != 0)
-            {
-                cout << "=====================================" << endl;
-                cout << " GENERACION DE IMAGENES" << endl;
-                cout << "=====================================" << endl;
-                cout << "1. Por recorrido limitado" << endl;
-                cout << "2. Por lista de imagenes" << endl;
-                cout << "3. Por capa" << endl;
-                cout << "4. Por usuario" << endl;
-                cout << "0. Regresar" << endl;
-                cout << "Ingrese una opcion: ";
-                cin >> opcionGenerar;
-
-                if (opcionGenerar == 1)
-                {
-                    cout << endl;
-                    cout << "Generar por recorrido limitado pendiente." << endl;
-                    cout << endl;
-                }
-                else if (opcionGenerar == 2)
-                {
-                    cout << endl;
-                    cout << "Generar por lista de imagenes pendiente." << endl;
-                    cout << endl;
-                }
-                else if (opcionGenerar == 3)
-                {
-                    cout << endl;
-                    cout << "Generar por capa pendiente." << endl;
-                    cout << endl;
-                }
-                else if (opcionGenerar == 4)
-                {
-                    cout << endl;
-                    cout << "Generar por usuario pendiente." << endl;
-                    cout << endl;
-                }
-                else if (opcionGenerar == 0)
-                {
-                    cout << endl;
-                    cout << "Regresando al menu principal..." << endl;
-                    cout << endl;
-                }
-                else
-                {
-                    cout << endl;
-                    cout << "Opcion no valida :( intente de nuevo" << endl;
-                    cout << endl;
-                }
-            }
-        }
-        else if (opcion == 5)
-        {
-            opcionCrud = -1;
-
-            while (opcionCrud != 0)
-            {
-                cout << "=====================================" << endl;
-                cout << " CRUD" << endl;
-                cout << "=====================================" << endl;
-                cout << "1. Usuarios" << endl;
-                cout << "2. Imagenes" << endl;
-                cout << "0. Regresar" << endl;
-                cout << "Ingrese una opcion: ";
-                cin >> opcionCrud;
-
-                if (opcionCrud == 1)
-                {
-                    cout << endl;
-                    cout << "CRUD de usuarios pendiente." << endl;
-                    cout << endl;
-                }
-                else if (opcionCrud == 2)
-                {
-                    cout << endl;
-                    cout << "CRUD de imagenes pendiente." << endl;
-                    cout << endl;
-                }
-                else if (opcionCrud == 0)
-                {
-                    cout << endl;
-                    cout << "Regresando al menu principal..." << endl;
-                    cout << endl;
-                }
-                else
-                {
-                    cout << endl;
-                    cout << "Opcion no valida :( intente de nuevo" << endl;
-                    cout << endl;
-                }
-            }
-        }
-        else if (opcion == 6)
-        {
-            opcionReportes = -1;
-
-            while (opcionReportes != 0)
-            {
-                cout << "=====================================" << endl;
-                cout << " ESTADO DE LA MEMORIA" << endl;
-                cout << "=====================================" << endl;
-                cout << "1. Ver lista de imagenes" << endl;
-                cout << "2. Ver arbol de capas" << endl;
-                cout << "3. Ver capa" << endl;
-                cout << "4. Ver imagen y arbol de capas" << endl;
-                cout << "5. Ver arbol de usuarios" << endl;
-                cout << "0. Regresar" << endl;
-                cout << "Ingrese una opcion: ";
-                cin >> opcionReportes;
-
-                if (opcionReportes == 1)
-                {
-                    cout << endl;
-                    cout << "Reporte de lista de imagenes pendiente." << endl;
-                    cout << endl;
-                }
-                else if (opcionReportes == 2)
-                {
-                    cout << endl;
-                    cout << "Reporte de arbol de capas pendiente." << endl;
-                    cout << endl;
-                }
-                else if (opcionReportes == 3)
-                {
-                    cout << endl;
-                    cout << "Reporte de capa pendiente." << endl;
-                    cout << endl;
-                }
-                else if (opcionReportes == 4)
-                {
-                    cout << endl;
-                    cout << "Reporte de imagen y arbol pendiente." << endl;
-                    cout << endl;
-                }
-                else if (opcionReportes == 5)
-                {
-                    cout << endl;
-                    cout << "Reporte de arbol de usuarios pendiente." << endl;
-                    cout << endl;
-                }
-                else if (opcionReportes == 0)
-                {
-                    cout << endl;
-                    cout << "Opcion no valida :( intente de nuevo" << endl;
-                    cout << endl;
-                }
-                else
-                {
-                    cout << endl;
-                    cout << "Opcion invalida." << endl;
-                    cout << endl;
-                }
-            }
-        }
-        else if (opcion == 0)
-        {
-            cout << endl;
-            cout << "Saliendo del programa" << endl;
-            cout << endl;
-        }
-        else
-        {
-            cout << endl;
-            cout << "Opcion no valida :( intente de nuevo" << endl;
-            cout << endl;
-        }
-    }
+    } while (opcion != 9);
 
     return 0;
 }
