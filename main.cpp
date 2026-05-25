@@ -2,12 +2,14 @@
 #include <string>
 #include "capas.cpp"
 #include "imagenes.cpp"
+#include "usuarios.cpp"
 
 using namespace std;
 
 int main() {
     ArbolCapas arbolCapas;
     ListaImagenes listaImagenes;
+    ArbolUsuarios arbolUsuarios;
     int opcion = -1;
     string ruta;
 
@@ -20,6 +22,9 @@ int main() {
         cout << "4. Cargar imagenes" << endl;
         cout << "5. Ver lista de imagenes" << endl;
         cout << "6. Ver detalle de una imagen" << endl;
+        cout << "7. Cargar usuarios" << endl;
+        cout << "8. Ver usuarios cargados" << endl;
+        cout << "9. Ver detalle de un usuario" << endl;
         cout << "0. Salir" << endl;
         cout << "Seleccione una opcion: ";
         cin >> opcion;
@@ -72,10 +77,29 @@ int main() {
             cout << "Ingrese el id de la imagen: ";
             cin >> id;
             listaImagenes.mostrarDetalleImagen(id);
+        } else if (opcion == 7) {
+            cout << "Primero debe cargar las imagenes para que los usuarios apunten a la lista circular." << endl;
+            cout << "Ingrese la ruta del archivo .usr: ";
+            cin >> ruta;
+
+            if (arbolUsuarios.cargarArchivo(ruta, listaImagenes)) {
+                cout << "Usuarios cargados correctamente." << endl;
+            } else {
+                cout << "No se pudo cargar el archivo." << endl;
+            }
+        } else if (opcion == 8) {
+            cout << endl;
+            cout << "Usuarios en inorden:" << endl;
+            arbolUsuarios.mostrarUsuarios();
+        } else if (opcion == 9) {
+            string nombre;
+            cout << "Ingrese el nombre del usuario: ";
+            cin >> nombre;
+            arbolUsuarios.mostrarDetalleUsuario(nombre);
         } else if (opcion == 0) {
-            cout << "Saliendo del programa" << endl;
+            cout << "Saliendo del programa..." << endl;
         } else {
-            cout << "Opcion no valida :( intente de nuevo" << endl;
+            cout << "Opcion invalida." << endl;
         }
     }
 
