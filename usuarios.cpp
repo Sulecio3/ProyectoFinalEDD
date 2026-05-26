@@ -5,6 +5,7 @@
 #include <fstream>
 #include <string>
 #include <cctype>
+#include <cstdlib>
 
 #ifndef IMAGENES_CPP
 #include "imagenes.cpp"
@@ -150,6 +151,49 @@ private:
         }
     }
 
+
+    string obtenerColorFinalUsuario(NodoImagen* imagen, int x, int y) {
+        string colorFinal = "#FFFFFF";
+
+        if (imagen == NULL) {
+            return colorFinal;
+        }
+
+        NodoCapaImagen* actual = imagen->primeraCapa;
+
+        while (actual != NULL) {
+            if (actual->capa != NULL) {
+                string colorCapa = actual->capa->matriz.obtenerColorReal(x, y);
+
+                if (colorCapa != "") {
+                    colorFinal = colorCapa;
+                }
+            }
+
+            actual = actual->siguiente;
+        }
+
+        return colorFinal;
+    }
+
+    NodoImagen* buscarImagenEnUsuario(NodoUsuario* usuario, int idImagen) {
+        if (usuario == NULL) {
+            return NULL;
+        }
+
+        NodoImagenUsuario* actual = usuario->primeraImagen;
+
+        while (actual != NULL) {
+            if (actual->idImagen == idImagen) {
+                return actual->imagen;
+            }
+
+            actual = actual->siguiente;
+        }
+
+        return NULL;
+    }
+
 public:
     ArbolUsuarios() {
         raiz = NULL;
@@ -269,6 +313,95 @@ public:
             actual = actual->siguiente;
         }
     }
+
+
+    bool generarImagenDeUsuario(string nombre, int idImagen) {
+        NodoUsuario* usuario = buscar(nombre);
+
+        if (usuario == NULL) {
+            return false;
+        }
+
+        NodoImagen* imagen = buscarImagenEnUsuario(usuario, idImagen);
+
+        if (imagen == NULL) {
+            return false;
+        }
+
+        int ancho = 0;
+        int alto = 0;
+        NodoCapaImagen* actual = imagen->primeraCapa;
+
+        while (actual != NULL) {
+            if (actual->capa != NULL) {
+                if (actual->capa->matriz.obtenerMaxX() > ancho) {
+                    ancho = actual->capa->matriz.obtenerMaxX();
+                }
+
+                if (actual->capa->matriz.obtenerMaxY() > alto) {
+                    alto = actual->capa->matriz.obtenerMaxY();
+                }
+            }
+
+            actual = actual->siguiente;
+        }
+
+        if (ancho <= 0) {
+            ancho = 1;
+        }
+
+        if (alto <= 0) {
+            alto = 1;
+        }
+
+        string nombreDot = "usuario_" + nombre + "_imagen_" + to_string(idImagen) + ".dot";
+        string nombrePng = "usuario_" + nombre + "_imagen_" + to_string(idImagen) + ".png";
+
+        ofstream archivo(nombreDot.c_str());
+
+        if (!archivo.is_open()) {
+            return false;
+        }
+
+        archivo << "digraph G {" << endl;
+        archivo << "node [shape=plain]" << endl;
+        archivo << "tabla [label=<" << endl;
+        archivo << "<TABLE BORDER=\"0\" CELLBORDER=\"1\" CELLSPACING=\"0\">" << endl;
+
+        for (int y = 1; y <= alto; y++) {
+            archivo << "<TR>" << endl;
+
+            for (int x = 1; x <= ancho; x++) {
+                string color = "#FFFFFF";
+
+                if (imagen->primeraCapa == NULL) {
+                    color = "#000000";
+                } else {
+                    color = obtenerColorFinalUsuario(imagen, x, y);
+                }
+
+                archivo << "<TD WIDTH=\"25\" HEIGHT=\"25\" BGCOLOR=\"" << color << "\"></TD>" << endl;
+            }
+
+            archivo << "</TR>" << endl;
+        }
+
+        archivo << "</TABLE>" << endl;
+        archivo << ">];" << endl;
+        archivo << "}" << endl;
+        archivo.close();
+
+        string comando = "dot -Tpng \"" + nombreDot + "\" -o \"" + nombrePng + "\"";
+        int resultado = system(comando.c_str());
+
+        if (resultado != 0) {
+            cout << "Se creo el archivo .dot, pero Graphviz no genero el .png." << endl;
+            cout << "Revise que Graphviz este instalado y agregado al PATH." << endl;
+        }
+
+        return true;
+    }
+
 };
 
 #endif

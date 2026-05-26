@@ -29,6 +29,7 @@ int main() {
         cout << "9. Ver detalle de un usuario" << endl;
         cout << "10. Generar imagen por capa" << endl;
         cout << "11. Generar imagen por lista de imagenes" << endl;
+        cout << "12. Generar imagen por usuario" << endl;
         cout << "0. Salir" << endl;
         cout << "Seleccione una opcion: ";
         cin >> opcion;
@@ -121,6 +122,22 @@ int main() {
                 cout << "Revise los archivos imagen_" << id << ".dot y imagen_" << id << ".png" << endl;
             } else {
                 cout << "No se pudo generar la imagen." << endl;
+            }
+        } else if (opcion == 12) {
+            string nombre;
+            int idImagen;
+
+            cout << "Ingrese el nombre del usuario: ";
+            cin >> nombre;
+            cout << "Ingrese el id de la imagen del usuario: ";
+            cin >> idImagen;
+
+            if (arbolUsuarios.generarImagenDeUsuario(nombre, idImagen)) {
+                cout << "Imagen generada correctamente." << endl;
+                cout << "Revise los archivos usuario_" << nombre << "_imagen_" << idImagen << ".dot y usuario_" << nombre << "_imagen_" << idImagen << ".png" << endl;
+            } else {
+                cout << "No se pudo generar la imagen." << endl;
+                cout << "Revise que el usuario exista y que tenga esa imagen asignada." << endl;
             }
         } else if (opcion == 0) {
             cout << "Saliendo del programa..." << endl;
