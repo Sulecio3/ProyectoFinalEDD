@@ -345,6 +345,76 @@ private:
         escribirNodosArbol(actual->derecha, archivo);
     }
 
+
+    void recorrerPreordenLimitado(NodoCapa* actual, NodoCapa** lista, int& contador, int limite) {
+        if (actual == NULL) {
+            return;
+        }
+
+        if (contador >= limite) {
+            return;
+        }
+
+        lista[contador] = actual;
+        contador++;
+
+        recorrerPreordenLimitado(actual->izquierda, lista, contador, limite);
+        recorrerPreordenLimitado(actual->derecha, lista, contador, limite);
+    }
+
+    void recorrerInordenLimitado(NodoCapa* actual, NodoCapa** lista, int& contador, int limite) {
+        if (actual == NULL) {
+            return;
+        }
+
+        if (contador >= limite) {
+            return;
+        }
+
+        recorrerInordenLimitado(actual->izquierda, lista, contador, limite);
+
+        if (contador < limite) {
+            lista[contador] = actual;
+            contador++;
+        }
+
+        recorrerInordenLimitado(actual->derecha, lista, contador, limite);
+    }
+
+    void recorrerPostordenLimitado(NodoCapa* actual, NodoCapa** lista, int& contador, int limite) {
+        if (actual == NULL) {
+            return;
+        }
+
+        if (contador >= limite) {
+            return;
+        }
+
+        recorrerPostordenLimitado(actual->izquierda, lista, contador, limite);
+        recorrerPostordenLimitado(actual->derecha, lista, contador, limite);
+
+        if (contador < limite) {
+            lista[contador] = actual;
+            contador++;
+        }
+    }
+
+    string obtenerColorFinalRecorrido(NodoCapa** lista, int total, int x, int y) {
+        string colorFinal = "#FFFFFF";
+
+        for (int i = 0; i < total; i++) {
+            if (lista[i] != NULL) {
+                string colorCapa = lista[i]->matriz.obtenerColorReal(x, y);
+
+                if (colorCapa != "") {
+                    colorFinal = colorCapa;
+                }
+            }
+        }
+
+        return colorFinal;
+    }
+
 public:
     ArbolCapas() {
         raiz = NULL;
@@ -522,6 +592,126 @@ public:
 
         return true;
     }
+    bool generarImagenRecorridoLimitado(int cantidad, int tipo) {
+        if (raiz == NULL) {
+            return false;
+        }
+
+        if (cantidad <= 0) {
+            return false;
+        }
+
+        if (tipo < 1 || tipo > 3) {
+            return false;
+        }
+
+        NodoCapa** lista = new NodoCapa*[cantidad];
+
+        for (int i = 0; i < cantidad; i++) {
+            lista[i] = NULL;
+        }
+
+        int contador = 0;
+        string nombreRecorrido = "";
+
+        if (tipo == 1) {
+            nombreRecorrido = "preorden";
+            recorrerPreordenLimitado(raiz, lista, contador, cantidad);
+        } else if (tipo == 2) {
+            nombreRecorrido = "inorden";
+            recorrerInordenLimitado(raiz, lista, contador, cantidad);
+        } else if (tipo == 3) {
+            nombreRecorrido = "postorden";
+            recorrerPostordenLimitado(raiz, lista, contador, cantidad);
+        }
+
+        if (contador <= 0) {
+            delete[] lista;
+            return false;
+        }
+
+        int ancho = 0;
+        int alto = 0;
+
+        for (int i = 0; i < contador; i++) {
+            if (lista[i] != NULL) {
+                if (lista[i]->matriz.obtenerMaxX() > ancho) {
+                    ancho = lista[i]->matriz.obtenerMaxX();
+                }
+
+                if (lista[i]->matriz.obtenerMaxY() > alto) {
+                    alto = lista[i]->matriz.obtenerMaxY();
+                }
+            }
+        }
+
+        if (ancho <= 0) {
+            ancho = 1;
+        }
+
+        if (alto <= 0) {
+            alto = 1;
+        }
+
+        string nombreDot = "recorrido_" + nombreRecorrido + "_" + to_string(cantidad) + ".dot";
+        string nombrePng = "recorrido_" + nombreRecorrido + "_" + to_string(cantidad) + ".png";
+
+        ofstream archivo(nombreDot.c_str());
+
+        if (!archivo.is_open()) {
+            delete[] lista;
+            return false;
+        }
+
+        archivo << "digraph G {" << endl;
+        archivo << "node [shape=plain]" << endl;
+        archivo << "tabla [label=<" << endl;
+        archivo << "<TABLE BORDER=\"0\" CELLBORDER=\"1\" CELLSPACING=\"0\">" << endl;
+        archivo << "<TR>" << endl;
+        archivo << "<TD COLSPAN=\"" << ancho << "\" BGCOLOR=\"#FDE1E8\"><FONT POINT-SIZE=\"18\">Recorrido " << nombreRecorrido << "</FONT></TD>" << endl;
+        archivo << "</TR>" << endl;
+        archivo << "<TR>" << endl;
+        archivo << "<TD COLSPAN=\"" << ancho << "\" BGCOLOR=\"#FFFFFF\">Capas: ";
+
+        for (int i = 0; i < contador; i++) {
+            archivo << lista[i]->id;
+
+            if (i < contador - 1) {
+                archivo << " - ";
+            }
+        }
+
+        archivo << "</TD>" << endl;
+        archivo << "</TR>" << endl;
+
+        for (int y = 1; y <= alto; y++) {
+            archivo << "<TR>" << endl;
+
+            for (int x = 1; x <= ancho; x++) {
+                string color = obtenerColorFinalRecorrido(lista, contador, x, y);
+                archivo << "<TD WIDTH=\"25\" HEIGHT=\"25\" BGCOLOR=\"" << color << "\"></TD>" << endl;
+            }
+
+            archivo << "</TR>" << endl;
+        }
+
+        archivo << "</TABLE>" << endl;
+        archivo << ">];" << endl;
+        archivo << "}" << endl;
+        archivo.close();
+
+        string comando = "dot -Tpng \"" + nombreDot + "\" -o \"" + nombrePng + "\"";
+        int resultado = system(comando.c_str());
+
+        if (resultado != 0) {
+            cout << "Se creo el archivo .dot, pero Graphviz no genero el .png." << endl;
+            cout << "Revise que Graphviz este instalado y agregado al PATH." << endl;
+        }
+
+        delete[] lista;
+        return true;
+    }
+
     bool arbolVacio() {
         if (raiz == NULL) {
             return true;

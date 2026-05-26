@@ -37,6 +37,7 @@ int main() {
         cout << "19. Eliminar usuario" << endl;
         cout << "20. Agregar imagen" << endl;
         cout << "21. Eliminar imagen" << endl;
+        cout << "22. Generar imagen por recorrido limitado" << endl;
         cout << "0. Salir" << endl;
         cout << "Seleccione una opcion: ";
         cin >> opcion;
@@ -280,6 +281,37 @@ int main() {
                 }
             } else {
                 cout << "Eliminacion cancelada." << endl;
+            }
+        } else if (opcion == 22) {
+            int cantidad;
+            int tipo;
+            string nombreRecorrido;
+
+            cout << "Ingrese la cantidad de capas a utilizar: ";
+            cin >> cantidad;
+            cout << "Seleccione el recorrido:" << endl;
+            cout << "1. Preorden" << endl;
+            cout << "2. Inorden" << endl;
+            cout << "3. Postorden" << endl;
+            cout << "Opcion: ";
+            cin >> tipo;
+
+            if (tipo == 1) {
+                nombreRecorrido = "preorden";
+            } else if (tipo == 2) {
+                nombreRecorrido = "inorden";
+            } else if (tipo == 3) {
+                nombreRecorrido = "postorden";
+            } else {
+                nombreRecorrido = "recorrido";
+            }
+
+            if (arbolCapas.generarImagenRecorridoLimitado(cantidad, tipo)) {
+                cout << "Imagen generada correctamente." << endl;
+                cout << "Revise los archivos recorrido_" << nombreRecorrido << "_" << cantidad << ".dot y recorrido_" << nombreRecorrido << "_" << cantidad << ".png" << endl;
+            } else {
+                cout << "No se pudo generar la imagen." << endl;
+                cout << "Revise que haya cargado las capas y que el recorrido sea valido." << endl;
             }
         } else if (opcion == 0) {
             cout << "Saliendo del programa" << endl;
