@@ -15,9 +15,7 @@ int main() {
 
     while (opcion != 0) {
         cout << endl;
-        cout << "======================================" << endl;
         cout << "     GENERADOR DE IMAGENES POR CAPAS  " << endl;
-        cout << "======================================" << endl;
         cout << "1. Cargar capas" << endl;
         cout << "2. Ver capas cargadas" << endl;
         cout << "3. Buscar una capa" << endl;
@@ -34,6 +32,9 @@ int main() {
         cout << "14. Graficar lista circular de imagenes" << endl;
         cout << "15. Graficar arbol de usuarios" << endl;
         cout << "16. Graficar imagen y arbol de capas" << endl;
+        cout << "17. Agregar usuario" << endl;
+        cout << "18. Modificar usuario" << endl;
+        cout << "19. Eliminar usuario" << endl;
         cout << "0. Salir" << endl;
         cout << "Seleccione una opcion: ";
         cin >> opcion;
@@ -179,10 +180,55 @@ int main() {
                 cout << "No se pudo generar el reporte." << endl;
                 cout << "Revise que primero haya cargado capas e imagenes." << endl;
             }
+        } else if (opcion == 17) {
+            string nombre;
+            cout << "Ingrese el nombre del nuevo usuario: ";
+            cin >> nombre;
+
+            if (arbolUsuarios.agregarUsuarioManual(nombre)) {
+                cout << "Usuario agregado correctamente." << endl;
+            } else {
+                cout << "No se pudo agregar el usuario." << endl;
+                cout << "Revise que no exista o que el nombre no este vacio." << endl;
+            }
+        } else if (opcion == 18) {
+            string nombreActual;
+            string nombreNuevo;
+
+            cout << "Ingrese el nombre actual del usuario: ";
+            cin >> nombreActual;
+            cout << "Ingrese el nuevo nombre del usuario: ";
+            cin >> nombreNuevo;
+
+            if (arbolUsuarios.modificarUsuario(nombreActual, nombreNuevo)) {
+                cout << "Usuario modificado correctamente." << endl;
+            } else {
+                cout << "No se pudo modificar el usuario." << endl;
+                cout << "Revise que el usuario exista y que el nuevo nombre no este repetido." << endl;
+            }
+        } else if (opcion == 19) {
+            string nombre;
+            char confirmar;
+
+            cout << "Ingrese el nombre del usuario a eliminar: ";
+            cin >> nombre;
+            cout << "Seguro que desea eliminarlo? s/n: ";
+            cin >> confirmar;
+
+            if (confirmar == 's' || confirmar == 'S') {
+                if (arbolUsuarios.eliminarUsuario(nombre)) {
+                    cout << "Usuario eliminado correctamente." << endl;
+                } else {
+                    cout << "No se pudo eliminar el usuario." << endl;
+                    cout << "Revise que el usuario exista." << endl;
+                }
+            } else {
+                cout << "Eliminacion cancelada." << endl;
+            }
         } else if (opcion == 0) {
-            cout << "Saliendo del programa..." << endl;
+            cout << "Saliendo del programa" << endl;
         } else {
-            cout << "Opcion invalida." << endl;
+            cout << "Opcion mo valida intentelo de nuevo." << endl;
         }
     }
 

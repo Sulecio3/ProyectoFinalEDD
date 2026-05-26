@@ -243,6 +243,87 @@ private:
         escribirNodosUsuarios(actual->derecha, archivo);
     }
 
+
+    NodoImagenUsuario* copiarListaImagenes(NodoImagenUsuario* original) {
+        NodoImagenUsuario* nuevaLista = NULL;
+        NodoImagenUsuario* ultimo = NULL;
+        NodoImagenUsuario* actual = original;
+
+        while (actual != NULL) {
+            NodoImagenUsuario* nuevo = new NodoImagenUsuario(actual->idImagen, actual->imagen);
+
+            if (nuevaLista == NULL) {
+                nuevaLista = nuevo;
+                ultimo = nuevo;
+            } else {
+                ultimo->siguiente = nuevo;
+                ultimo = nuevo;
+            }
+
+            actual = actual->siguiente;
+        }
+
+        return nuevaLista;
+    }
+
+    void borrarListaImagenes(NodoImagenUsuario* lista) {
+        NodoImagenUsuario* actual = lista;
+
+        while (actual != NULL) {
+            NodoImagenUsuario* borrar = actual;
+            actual = actual->siguiente;
+            delete borrar;
+        }
+    }
+
+    NodoUsuario* obtenerMenor(NodoUsuario* actual) {
+        while (actual != NULL && actual->izquierda != NULL) {
+            actual = actual->izquierda;
+        }
+
+        return actual;
+    }
+
+    NodoUsuario* eliminarRecursivo(NodoUsuario* actual, string nombre, bool& eliminado) {
+        if (actual == NULL) {
+            return NULL;
+        }
+
+        if (nombre < actual->nombre) {
+            actual->izquierda = eliminarRecursivo(actual->izquierda, nombre, eliminado);
+        } else if (nombre > actual->nombre) {
+            actual->derecha = eliminarRecursivo(actual->derecha, nombre, eliminado);
+        } else {
+            eliminado = true;
+
+            if (actual->izquierda == NULL && actual->derecha == NULL) {
+                borrarListaImagenes(actual->primeraImagen);
+                delete actual;
+                return NULL;
+            } else if (actual->izquierda == NULL) {
+                NodoUsuario* temp = actual->derecha;
+                borrarListaImagenes(actual->primeraImagen);
+                delete actual;
+                return temp;
+            } else if (actual->derecha == NULL) {
+                NodoUsuario* temp = actual->izquierda;
+                borrarListaImagenes(actual->primeraImagen);
+                delete actual;
+                return temp;
+            } else {
+                NodoUsuario* menor = obtenerMenor(actual->derecha);
+                actual->nombre = menor->nombre;
+                borrarListaImagenes(actual->primeraImagen);
+                actual->primeraImagen = copiarListaImagenes(menor->primeraImagen);
+
+                bool eliminadoInterno = false;
+                actual->derecha = eliminarRecursivo(actual->derecha, menor->nombre, eliminadoInterno);
+            }
+        }
+
+        return actual;
+    }
+
 public:
     ArbolUsuarios() {
         raiz = NULL;
@@ -449,6 +530,62 @@ public:
         }
 
         return true;
+    }
+
+
+    bool agregarUsuarioManual(string nombre) {
+        if (nombre == "") {
+            return false;
+        }
+
+        if (buscar(nombre) != NULL) {
+            return false;
+        }
+
+        insertar(nombre);
+        return true;
+    }
+
+    bool eliminarUsuario(string nombre) {
+        bool eliminado = false;
+        raiz = eliminarRecursivo(raiz, nombre, eliminado);
+        return eliminado;
+    }
+
+    bool modificarUsuario(string nombreActual, string nombreNuevo) {
+        if (nombreActual == "" || nombreNuevo == "") {
+            return false;
+        }
+
+        if (buscar(nombreNuevo) != NULL) {
+            return false;
+        }
+
+        NodoUsuario* usuarioActual = buscar(nombreActual);
+
+        if (usuarioActual == NULL) {
+            return false;
+        }
+
+        NodoImagenUsuario* copiaImagenes = copiarListaImagenes(usuarioActual->primeraImagen);
+
+        bool eliminado = eliminarUsuario(nombreActual);
+
+        if (!eliminado) {
+            borrarListaImagenes(copiaImagenes);
+            return false;
+        }
+
+        insertar(nombreNuevo);
+        NodoUsuario* usuarioNuevo = buscar(nombreNuevo);
+
+        if (usuarioNuevo != NULL) {
+            usuarioNuevo->primeraImagen = copiaImagenes;
+            return true;
+        }
+
+        borrarListaImagenes(copiaImagenes);
+        return false;
     }
 
     bool graficarArbolUsuarios() {

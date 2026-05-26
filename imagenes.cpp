@@ -461,7 +461,7 @@ public:
         return true;
     }
 
-    bool  graficarImagenYArbol(int id, ArbolCapas& arbolCapas) {
+    bool graficarImagenYArbol(int id, ArbolCapas& arbolCapas) {
         NodoImagen* imagen = buscar(id);
 
         if (imagen == NULL) {
