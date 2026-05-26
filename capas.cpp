@@ -522,6 +522,18 @@ public:
 
         return true;
     }
+    bool arbolVacio() {
+        if (raiz == NULL) {
+            return true;
+        }
+
+        return false;
+    }
+
+    void escribirArbolEnArchivo(ofstream& archivo) {
+        escribirNodosArbol(raiz, archivo);
+    }
+
     bool graficarArbolCapas() {
         if (raiz == NULL) {
             return false;

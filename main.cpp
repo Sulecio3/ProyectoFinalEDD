@@ -15,7 +15,9 @@ int main() {
 
     while (opcion != 0) {
         cout << endl;
+        cout << "======================================" << endl;
         cout << "     GENERADOR DE IMAGENES POR CAPAS  " << endl;
+        cout << "======================================" << endl;
         cout << "1. Cargar capas" << endl;
         cout << "2. Ver capas cargadas" << endl;
         cout << "3. Buscar una capa" << endl;
@@ -31,6 +33,7 @@ int main() {
         cout << "13. Graficar arbol de capas" << endl;
         cout << "14. Graficar lista circular de imagenes" << endl;
         cout << "15. Graficar arbol de usuarios" << endl;
+        cout << "16. Graficar imagen y arbol de capas" << endl;
         cout << "0. Salir" << endl;
         cout << "Seleccione una opcion: ";
         cin >> opcion;
@@ -164,10 +167,22 @@ int main() {
                 cout << "No se pudo generar el arbol de usuarios." << endl;
                 cout << "Revise que primero haya cargado los usuarios." << endl;
             }
+        } else if (opcion == 16) {
+            int id;
+            cout << "Ingrese el id de la imagen: ";
+            cin >> id;
+
+            if (listaImagenes.graficarImagenYArbol(id, arbolCapas)) {
+                cout << "Reporte generado correctamente." << endl;
+                cout << "Revise los archivos imagen_arbol_" << id << ".dot y imagen_arbol_" << id << ".png" << endl;
+            } else {
+                cout << "No se pudo generar el reporte." << endl;
+                cout << "Revise que primero haya cargado capas e imagenes." << endl;
+            }
         } else if (opcion == 0) {
             cout << "Saliendo del programa..." << endl;
         } else {
-            cout << "Opcion mo valida intentelo de nuevo." << endl;
+            cout << "Opcion invalida." << endl;
         }
     }
 

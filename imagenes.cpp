@@ -461,6 +461,98 @@ public:
         return true;
     }
 
+    bool  graficarImagenYArbol(int id, ArbolCapas& arbolCapas) {
+        NodoImagen* imagen = buscar(id);
+
+        if (imagen == NULL) {
+            return false;
+        }
+
+        if (arbolCapas.arbolVacio()) {
+            return false;
+        }
+
+        string nombreDot = "imagen_arbol_" + to_string(id) + ".dot";
+        string nombrePng = "imagen_arbol_" + to_string(id) + ".png";
+
+        ofstream archivo(nombreDot.c_str());
+
+        if (!archivo.is_open()) {
+            return false;
+        }
+
+        archivo << "digraph G {" << endl;
+        archivo << "rankdir=LR;" << endl;
+        archivo << "node [shape=box, style=filled, fontname=\"Arial\"];" << endl;
+        archivo << "edge [fontname=\"Arial\"];" << endl;
+
+        archivo << "subgraph cluster_lista {" << endl;
+        archivo << "label=\"Lista de capas de la imagen " << id << "\";" << endl;
+        archivo << "color=\"#007C89\";" << endl;
+        archivo << "imagen_seleccionada [label=\"Imagen " << id << "\", fillcolor=\"#E0F7FA\", color=\"#007C89\"];" << endl;
+
+        NodoCapaImagen* capa = imagen->primeraCapa;
+        int contador = 1;
+        string anterior = "imagen_seleccionada";
+
+        if (capa == NULL) {
+            archivo << "lista_sin_capas [label=\"Sin capas\", fillcolor=\"#FFFFFF\", color=\"#444444\"];" << endl;
+            archivo << "imagen_seleccionada -> lista_sin_capas [color=\"#444444\"];" << endl;
+        }
+
+        while (capa != NULL) {
+            string nombreNodo = "lista_" + to_string(id) + "_" + to_string(contador);
+            archivo << nombreNodo << " [label=\"Capa " << capa->idCapa;
+
+            if (capa->capa != NULL) {
+                archivo << "\\nApunta al ABB";
+            } else {
+                archivo << "\\nNo encontrada";
+            }
+
+            archivo << "\", fillcolor=\"#E0F7FA\", color=\"#007C89\"];" << endl;
+            archivo << anterior << " -> " << nombreNodo << " [color=\"#007C89\"];" << endl;
+
+            anterior = nombreNodo;
+            contador++;
+            capa = capa->siguiente;
+        }
+
+        archivo << "}" << endl;
+
+        archivo << "subgraph cluster_arbol {" << endl;
+        archivo << "label=\"Arbol ABB de capas\";" << endl;
+        archivo << "color=\"#C2185B\";" << endl;
+        archivo << "node [shape=box, style=filled, fillcolor=\"#FDE1E8\", color=\"#C2185B\", fontname=\"Arial\"];" << endl;
+        arbolCapas.escribirArbolEnArchivo(archivo);
+        archivo << "}" << endl;
+
+        capa = imagen->primeraCapa;
+        contador = 1;
+
+        while (capa != NULL) {
+            if (capa->capa != NULL) {
+                archivo << "lista_" << id << "_" << contador << " -> nodo" << capa->idCapa << " [style=dashed, color=\"#E91E63\", label=\"apunta\"];" << endl;
+            }
+
+            contador++;
+            capa = capa->siguiente;
+        }
+
+        archivo << "}" << endl;
+        archivo.close();
+
+        string comando = "dot -Tpng \"" + nombreDot + "\" -o \"" + nombrePng + "\"";
+        int resultado = system(comando.c_str());
+
+        if (resultado != 0) {
+            cout << "Se creo el archivo .dot, pero Graphviz no genero el .png." << endl;
+            cout << "Revise que Graphviz este instalado y agregado al PATH." << endl;
+        }
+
+        return true;
+    }
+
 };
 
 #endif
