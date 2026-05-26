@@ -38,6 +38,7 @@ int main() {
         cout << "20. Agregar imagen" << endl;
         cout << "21. Eliminar imagen" << endl;
         cout << "22. Generar imagen por recorrido limitado" << endl;
+        cout << "23. Graficar capa como matriz dispersa" << endl;
         cout << "0. Salir" << endl;
         cout << "Seleccione una opcion: ";
         cin >> opcion;
@@ -313,10 +314,22 @@ int main() {
                 cout << "No se pudo generar la imagen." << endl;
                 cout << "Revise que haya cargado las capas y que el recorrido sea valido." << endl;
             }
+        } else if (opcion == 23) {
+            int id;
+            cout << "Ingrese el id de la capa a graficar como matriz dispersa: ";
+            cin >> id;
+
+            if (arbolCapas.graficarMatrizCapa(id)) {
+                cout << "Matriz dispersa generada correctamente." << endl;
+                cout << "Revise los archivos matriz_capa_" << id << ".dot y matriz_capa_" << id << ".png" << endl;
+            } else {
+                cout << "No se pudo generar la matriz dispersa." << endl;
+                cout << "Revise que la capa exista y que primero haya cargado las capas." << endl;
+            }
         } else if (opcion == 0) {
             cout << "Saliendo del programa" << endl;
         } else {
-            cout << "Opcion mo valida intentelo de nuevo." << endl;
+            cout << "Opcion no valida, intente de nuevo." << endl;
         }
     }
 

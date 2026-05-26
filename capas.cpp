@@ -237,6 +237,119 @@ public:
 
         return "";
     }
+
+    bool graficarEstructura(string nombreDot, string nombrePng, int idCapa) {
+        ofstream archivo(nombreDot.c_str());
+        char q = 34;
+
+        if (!archivo.is_open()) {
+            return false;
+        }
+
+        archivo << "digraph G {" << endl;
+        archivo << "rankdir=LR;" << endl;
+        archivo << "node [shape=box, style=filled, fontname=" << q << "Arial" << q << "];" << endl;
+        archivo << "edge [color=" << q << "#444444" << q << "];" << endl;
+        archivo << "titulo [label=" << q << "Matriz dispersa de capa " << idCapa << q << ", fillcolor=" << q << "#FDE1E8" << q << ", color=" << q << "#C2185B" << q << "];" << endl;
+        archivo << "matriz [label=" << q << "matriz" << q << ", fillcolor=" << q << "#FDE1E8" << q << ", color=" << q << "#C2185B" << q << "];" << endl;
+        archivo << "titulo -> matriz [style=invis];" << endl;
+
+        NodoEncabezado* columna = columnas.obtenerPrimero();
+
+        while (columna != NULL) {
+            archivo << "col" << columna->id << " [label=" << q << "Columna " << columna->id << q << ", fillcolor=" << q << "#DDF7F8" << q << ", color=" << q << "#008B95" << q << "];" << endl;
+            columna = columna->siguiente;
+        }
+
+        NodoEncabezado* fila = filas.obtenerPrimero();
+
+        while (fila != NULL) {
+            archivo << "fila" << fila->id << " [label=" << q << "Fila " << fila->id << q << ", fillcolor=" << q << "#FFF3E0" << q << ", color=" << q << "#EF6C00" << q << "];" << endl;
+            fila = fila->siguiente;
+        }
+
+        fila = filas.obtenerPrimero();
+
+        while (fila != NULL) {
+            NodoPixel* pixel = fila->acceso;
+
+            while (pixel != NULL) {
+                archivo << "p" << pixel->x << "_" << pixel->y << " [label=" << q << "(" << pixel->x << "," << pixel->y << ")\\n" << pixel->color << q << ", fillcolor=" << q << pixel->color << q << ", color=" << q << "#222222" << q << "];" << endl;
+                pixel = pixel->derecha;
+            }
+
+            fila = fila->siguiente;
+        }
+
+        columna = columnas.obtenerPrimero();
+
+        if (columna != NULL) {
+            archivo << "matriz -> col" << columna->id << ";" << endl;
+
+            while (columna->siguiente != NULL) {
+                archivo << "col" << columna->id << " -> col" << columna->siguiente->id << ";" << endl;
+                columna = columna->siguiente;
+            }
+        }
+
+        fila = filas.obtenerPrimero();
+
+        if (fila != NULL) {
+            archivo << "matriz -> fila" << fila->id << ";" << endl;
+
+            while (fila->siguiente != NULL) {
+                archivo << "fila" << fila->id << " -> fila" << fila->siguiente->id << ";" << endl;
+                fila = fila->siguiente;
+            }
+        }
+
+        fila = filas.obtenerPrimero();
+
+        while (fila != NULL) {
+            NodoPixel* pixel = fila->acceso;
+
+            if (pixel != NULL) {
+                archivo << "fila" << fila->id << " -> p" << pixel->x << "_" << pixel->y << ";" << endl;
+
+                while (pixel->derecha != NULL) {
+                    archivo << "p" << pixel->x << "_" << pixel->y << " -> p" << pixel->derecha->x << "_" << pixel->derecha->y << ";" << endl;
+                    pixel = pixel->derecha;
+                }
+            }
+
+            fila = fila->siguiente;
+        }
+
+        columna = columnas.obtenerPrimero();
+
+        while (columna != NULL) {
+            NodoPixel* pixel = columna->acceso;
+
+            if (pixel != NULL) {
+                archivo << "col" << columna->id << " -> p" << pixel->x << "_" << pixel->y << " [color=" << q << "#008B95" << q << "];" << endl;
+
+                while (pixel->abajo != NULL) {
+                    archivo << "p" << pixel->x << "_" << pixel->y << " -> p" << pixel->abajo->x << "_" << pixel->abajo->y << " [color=" << q << "#008B95" << q << "];" << endl;
+                    pixel = pixel->abajo;
+                }
+            }
+
+            columna = columna->siguiente;
+        }
+
+        archivo << "}" << endl;
+        archivo.close();
+
+        string comando = "dot -Tpng \"" + nombreDot + "\" -o \"" + nombrePng + "\"";
+        int resultado = system(comando.c_str());
+
+        if (resultado != 0) {
+            cout << "Se creo el archivo .dot, pero Graphviz no genero el .png." << endl;
+            cout << "Revise que Graphviz este instalado y agregado al PATH." << endl;
+        }
+
+        return true;
+    }
 };
 
 struct NodoCapa {
@@ -755,6 +868,24 @@ public:
         }
 
         return true;
+    }
+
+
+    bool graficarMatrizCapa(int id) {
+        NodoCapa* capa = buscar(id);
+
+        if (capa == NULL) {
+            return false;
+        }
+
+        if (capa->matriz.contarPixeles() <= 0) {
+            return false;
+        }
+
+        string nombreDot = "matriz_capa_" + to_string(id) + ".dot";
+        string nombrePng = "matriz_capa_" + to_string(id) + ".png";
+
+        return capa->matriz.graficarEstructura(nombreDot, nombrePng, id);
     }
 
 };
