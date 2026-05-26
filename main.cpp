@@ -29,6 +29,8 @@ int main() {
         cout << "11. Generar imagen por lista de imagenes" << endl;
         cout << "12. Generar imagen por usuario" << endl;
         cout << "13. Graficar arbol de capas" << endl;
+        cout << "14. Graficar lista circular de imagenes" << endl;
+        cout << "15. Graficar arbol de usuarios" << endl;
         cout << "0. Salir" << endl;
         cout << "Seleccione una opcion: ";
         cin >> opcion;
@@ -146,10 +148,26 @@ int main() {
                 cout << "No se pudo generar el arbol de capas." << endl;
                 cout << "Revise que primero haya cargado las capas." << endl;
             }
+        } else if (opcion == 14) {
+            if (listaImagenes.graficarListaImagenes()) {
+                cout << "Lista de imagenes generada correctamente." << endl;
+                cout << "Revise los archivos lista_imagenes.dot y lista_imagenes.png" << endl;
+            } else {
+                cout << "No se pudo generar la lista de imagenes." << endl;
+                cout << "Revise que primero haya cargado las imagenes." << endl;
+            }
+        } else if (opcion == 15) {
+            if (arbolUsuarios.graficarArbolUsuarios()) {
+                cout << "Arbol de usuarios generado correctamente." << endl;
+                cout << "Revise los archivos arbol_usuarios.dot y arbol_usuarios.png" << endl;
+            } else {
+                cout << "No se pudo generar el arbol de usuarios." << endl;
+                cout << "Revise que primero haya cargado los usuarios." << endl;
+            }
         } else if (opcion == 0) {
-            cout << "Saliendo del programa" << endl;
+            cout << "Saliendo del programa..." << endl;
         } else {
-            cout << "Opcion invalida" << endl;
+            cout << "Opcion mo valida intentelo de nuevo." << endl;
         }
     }
 

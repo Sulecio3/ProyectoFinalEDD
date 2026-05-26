@@ -194,6 +194,55 @@ private:
         return NULL;
     }
 
+
+    void escribirNodosUsuarios(NodoUsuario* actual, ofstream& archivo) {
+        if (actual == NULL) {
+            return;
+        }
+
+        char comilla = 34;
+
+        archivo << "usuario_" << actual->nombre << " [label=" << comilla << "Usuario: " << actual->nombre << "\\nImagenes: " << contarImagenes(actual) << comilla;
+        archivo << ", fillcolor=" << comilla << "#E8F5E9" << comilla << ", color=" << comilla << "#2E7D32" << comilla << "];" << endl;
+
+        if (actual->izquierda != NULL) {
+            archivo << "usuario_" << actual->nombre << " -> usuario_" << actual->izquierda->nombre;
+            archivo << " [color=" << comilla << "#2E7D32" << comilla << "];" << endl;
+        }
+
+        if (actual->derecha != NULL) {
+            archivo << "usuario_" << actual->nombre << " -> usuario_" << actual->derecha->nombre;
+            archivo << " [color=" << comilla << "#2E7D32" << comilla << "];" << endl;
+        }
+
+        NodoImagenUsuario* imagenActual = actual->primeraImagen;
+        int contador = 1;
+        string anterior = "usuario_" + actual->nombre;
+
+        while (imagenActual != NULL) {
+            string nombreNodo = "usuario_" + actual->nombre + "_imagen_" + to_string(contador);
+
+            archivo << nombreNodo << " [label=" << comilla << "Imagen " << imagenActual->idImagen;
+
+            if (imagenActual->imagen != NULL) {
+                archivo << "\\nApunta a lista circular";
+            } else {
+                archivo << "\\nNo encontrada";
+            }
+
+            archivo << comilla << ", fillcolor=" << comilla << "#FFF3E0" << comilla;
+            archivo << ", color=" << comilla << "#EF6C00" << comilla << "];" << endl;
+            archivo << anterior << " -> " << nombreNodo << " [style=dashed, color=" << comilla << "#EF6C00" << comilla << "];" << endl;
+
+            anterior = nombreNodo;
+            contador++;
+            imagenActual = imagenActual->siguiente;
+        }
+
+        escribirNodosUsuarios(actual->izquierda, archivo);
+        escribirNodosUsuarios(actual->derecha, archivo);
+    }
+
 public:
     ArbolUsuarios() {
         raiz = NULL;
@@ -401,6 +450,44 @@ public:
 
         return true;
     }
+
+    bool graficarArbolUsuarios() {
+        if (raiz == NULL) {
+            return false;
+        }
+
+        string nombreDot = "arbol_usuarios.dot";
+        string nombrePng = "arbol_usuarios.png";
+
+        ofstream archivo(nombreDot.c_str());
+
+        if (!archivo.is_open()) {
+            return false;
+        }
+
+        char comilla = 34;
+
+        archivo << "digraph G {" << endl;
+        archivo << "rankdir=TB;" << endl;
+        archivo << "node [shape=box, style=filled, fontname=" << comilla << "Arial" << comilla << "];" << endl;
+        archivo << "edge [fontname=" << comilla << "Arial" << comilla << "];" << endl;
+        archivo << "label=" << comilla << "Arbol binario de usuarios" << comilla << ";" << endl;
+        archivo << "labelloc=" << comilla << "t" << comilla << ";" << endl;
+        escribirNodosUsuarios(raiz, archivo);
+        archivo << "}" << endl;
+        archivo.close();
+
+        string comando = "dot -Tpng \"" + nombreDot + "\" -o \"" + nombrePng + "\"";
+        int resultado = system(comando.c_str());
+
+        if (resultado != 0) {
+            cout << "Se creo el archivo .dot, pero Graphviz no genero el .png." << endl;
+            cout << "Revise que Graphviz este instalado y agregado al PATH." << endl;
+        }
+
+        return true;
+    }
+
 
 };
 

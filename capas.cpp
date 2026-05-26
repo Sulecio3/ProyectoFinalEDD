@@ -331,7 +331,7 @@ private:
             return;
         }
 
-        archivo << "nodo" << actual->id << " [label=\"Capa " << actual->id << "\\nPixeles: " << actual->matriz.contarPixeles() << "\"];" << endl;   
+        archivo << "nodo" << actual->id << " [label=\"Capa " << actual->id << "\\nPixeles: " << actual->matriz.contarPixeles() << "\"];" << endl;
 
         if (actual->izquierda != NULL) {
             archivo << "nodo" << actual->id << " -> nodo" << actual->izquierda->id << ";" << endl;
@@ -544,7 +544,7 @@ public:
         archivo << "}" << endl;
         archivo.close();
 
-        string comando = "dot -Tpng "" + nombreDot + "" -o "" + nombrePng + """;
+        string comando = "dot -Tpng \"" + nombreDot + "\" -o \"" + nombrePng + "\"";
         int resultado = system(comando.c_str());
 
         if (resultado != 0) {

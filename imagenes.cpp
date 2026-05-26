@@ -373,6 +373,94 @@ public:
 
         return true;
     }
+
+    bool graficarListaImagenes() {
+        if (primero == NULL) {
+            return false;
+        }
+
+        string nombreDot = "lista_imagenes.dot";
+        string nombrePng = "lista_imagenes.png";
+
+        ofstream archivo(nombreDot.c_str());
+
+        if (!archivo.is_open()) {
+            return false;
+        }
+
+        archivo << "digraph G {" << endl;
+        archivo << "rankdir=LR;" << endl;
+        archivo << "node [shape=box, style=filled, fontname=\"Arial\"];" << endl;
+        archivo << "edge [fontname=\"Arial\"];" << endl;
+        archivo << "subgraph cluster_imagenes {" << endl;
+        archivo << "label=\"Lista circular doble de imagenes\";" << endl;
+        archivo << "color=\"#C2185B\";" << endl;
+
+        NodoImagen* actual = primero;
+
+        do {
+            archivo << "imagen" << actual->id << " [label=\"Imagen " << actual->id << "\", fillcolor=\"#FDE1E8\", color=\"#C2185B\"];" << endl;
+            actual = actual->siguiente;
+        } while (actual != primero);
+
+        actual = primero;
+
+        do {
+            archivo << "imagen" << actual->id << " -> imagen" << actual->siguiente->id << " [label=\"sig\", color=\"#C2185B\"];" << endl;
+            archivo << "imagen" << actual->id << " -> imagen" << actual->anterior->id << " [label=\"ant\", color=\"#555555\"];" << endl;
+            actual = actual->siguiente;
+        } while (actual != primero);
+
+        archivo << "}" << endl;
+
+        actual = primero;
+
+        do {
+            NodoCapaImagen* capa = actual->primeraCapa;
+            int contador = 1;
+            string anterior = "imagen" + to_string(actual->id);
+
+            if (capa == NULL) {
+                string nombreNodo = "imagen" + to_string(actual->id) + "capa0";
+                archivo << nombreNodo << " [label=\"Sin capas\", fillcolor=\"#FFFFFF\", color=\"#444444\"];" << endl;
+                archivo << anterior << " -> " << nombreNodo << " [style=dashed, color=\"#444444\"];" << endl;
+            }
+
+            while (capa != NULL) {
+                string nombreNodo = "imagen" + to_string(actual->id) + "capa" + to_string(contador);
+                archivo << nombreNodo << " [label=\"Capa " << capa->idCapa;
+
+                if (capa->capa != NULL) {
+                    archivo << "\\nApunta al ABB";
+                } else {
+                    archivo << "\\nNo encontrada";
+                }
+
+                archivo << "\", fillcolor=\"#E0F7FA\", color=\"#007C89\"];" << endl;
+                archivo << anterior << " -> " << nombreNodo << " [color=\"#007C89\"];" << endl;
+
+                anterior = nombreNodo;
+                contador++;
+                capa = capa->siguiente;
+            }
+
+            actual = actual->siguiente;
+        } while (actual != primero);
+
+        archivo << "}" << endl;
+        archivo.close();
+
+        string comando = "dot -Tpng \"" + nombreDot + "\" -o \"" + nombrePng + "\"";
+        int resultado = system(comando.c_str());
+
+        if (resultado != 0) {
+            cout << "Se creo el archivo .dot, pero Graphviz no genero el .png." << endl;
+            cout << "Revise que Graphviz este instalado y agregado al PATH." << endl;
+        }
+
+        return true;
+    }
+
 };
 
 #endif
