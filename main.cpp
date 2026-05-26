@@ -15,7 +15,9 @@ int main() {
 
     while (opcion != 0) {
         cout << endl;
+        cout << "======================================" << endl;
         cout << "     GENERADOR DE IMAGENES POR CAPAS  " << endl;
+        cout << "======================================" << endl;
         cout << "1. Cargar capas" << endl;
         cout << "2. Ver capas cargadas" << endl;
         cout << "3. Buscar una capa" << endl;
@@ -26,6 +28,7 @@ int main() {
         cout << "8. Ver usuarios cargados" << endl;
         cout << "9. Ver detalle de un usuario" << endl;
         cout << "10. Generar imagen por capa" << endl;
+        cout << "11. Generar imagen por lista de imagenes" << endl;
         cout << "0. Salir" << endl;
         cout << "Seleccione una opcion: ";
         cin >> opcion;
@@ -108,10 +111,21 @@ int main() {
             } else {
                 cout << "No se pudo generar la imagen." << endl;
             }
+        } else if (opcion == 11) {
+            int id;
+            cout << "Ingrese el id de la imagen a generar: ";
+            cin >> id;
+
+            if (listaImagenes.generarImagenPorId(id)) {
+                cout << "Imagen generada correctamente." << endl;
+                cout << "Revise los archivos imagen_" << id << ".dot y imagen_" << id << ".png" << endl;
+            } else {
+                cout << "No se pudo generar la imagen." << endl;
+            }
         } else if (opcion == 0) {
-            cout << "Saliendo del programa" << endl;
+            cout << "Saliendo del programa..." << endl;
         } else {
-            cout << "Opcion no valida :( intente de nuevo" << endl;
+            cout << "Opcion invalida." << endl;
         }
     }
 

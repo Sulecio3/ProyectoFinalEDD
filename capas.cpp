@@ -217,6 +217,26 @@ public:
 
         return "#FFFFFF";
     }
+
+    string obtenerColorReal(int x, int y) {
+        NodoEncabezado* fila = filas.buscar(y);
+
+        if (fila == NULL) {
+            return "";
+        }
+
+        NodoPixel* pixel = fila->acceso;
+
+        while (pixel != NULL) {
+            if (pixel->x == x) {
+                return pixel->color;
+            }
+
+            pixel = pixel->derecha;
+        }
+
+        return "";
+    }
 };
 
 struct NodoCapa {
