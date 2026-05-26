@@ -326,6 +326,25 @@ private:
         return color;
     }
 
+    void escribirNodosArbol(NodoCapa* actual, ofstream& archivo) {
+        if (actual == NULL) {
+            return;
+        }
+
+        archivo << "nodo" << actual->id << " [label=\"Capa " << actual->id << "\\nPixeles: " << actual->matriz.contarPixeles() << "\"];" << endl;   
+
+        if (actual->izquierda != NULL) {
+            archivo << "nodo" << actual->id << " -> nodo" << actual->izquierda->id << ";" << endl;
+        }
+
+        if (actual->derecha != NULL) {
+            archivo << "nodo" << actual->id << " -> nodo" << actual->derecha->id << ";" << endl;
+        }
+
+        escribirNodosArbol(actual->izquierda, archivo);
+        escribirNodosArbol(actual->derecha, archivo);
+    }
+
 public:
     ArbolCapas() {
         raiz = NULL;
@@ -503,6 +522,39 @@ public:
 
         return true;
     }
+    bool graficarArbolCapas() {
+        if (raiz == NULL) {
+            return false;
+        }
+
+        string nombreDot = "arbol_capas.dot";
+        string nombrePng = "arbol_capas.png";
+
+        ofstream archivo(nombreDot.c_str());
+
+        if (!archivo.is_open()) {
+            return false;
+        }
+
+        archivo << "digraph G {" << endl;
+        archivo << "rankdir=TB;" << endl;
+        archivo << "node [shape=box, style=filled, fillcolor=\"#FDE1E8\", color=\"#C2185B\", fontname=\"Arial\"];" << endl;
+        archivo << "edge [color=\"#444444\"];" << endl;
+        escribirNodosArbol(raiz, archivo);
+        archivo << "}" << endl;
+        archivo.close();
+
+        string comando = "dot -Tpng "" + nombreDot + "" -o "" + nombrePng + """;
+        int resultado = system(comando.c_str());
+
+        if (resultado != 0) {
+            cout << "Se creo el archivo .dot, pero Graphviz no genero el .png." << endl;
+            cout << "Revise que Graphviz este instalado y agregado al PATH." << endl;
+        }
+
+        return true;
+    }
+
 };
 
 #endif
