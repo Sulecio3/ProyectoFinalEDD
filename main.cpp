@@ -43,7 +43,9 @@ char leerCaracter(string mensaje) {
 
 void mostrarMenu() {
     cout << endl;
+    cout << "======================================" << endl;
     cout << "     GENERADOR DE IMAGENES POR CAPAS  " << endl;
+    cout << "======================================" << endl;
     cout << "1. Cargar capas" << endl;
     cout << "2. Ver capas cargadas" << endl;
     cout << "3. Buscar una capa" << endl;
