@@ -81,6 +81,17 @@ private:
         }
     }
 
+
+    void borrarCapasImagen(NodoCapaImagen* primera) {
+        NodoCapaImagen* actual = primera;
+
+        while (actual != NULL) {
+            NodoCapaImagen* borrar = actual;
+            actual = actual->siguiente;
+            delete borrar;
+        }
+    }
+
     string obtenerColorFinal(NodoImagen* imagen, int x, int y) {
         string colorFinal = "#FFFFFF";
         NodoCapaImagen* actual = imagen->primeraCapa;
@@ -162,6 +173,62 @@ public:
         actual->siguiente = nueva;
 
         return nueva;
+    }
+
+
+    bool agregarImagenManual(int id, string capasTexto, ArbolCapas& arbolCapas) {
+        if (id <= 0) {
+            return false;
+        }
+
+        if (buscar(id) != NULL) {
+            return false;
+        }
+
+        NodoImagen* nuevaImagen = insertarOrdenado(id);
+
+        if (nuevaImagen == NULL) {
+            return false;
+        }
+
+        int i = 0;
+
+        while (i < capasTexto.length()) {
+            if (isdigit(capasTexto[i])) {
+                int idCapa = leerNumero(capasTexto, i);
+                agregarCapaAImagen(nuevaImagen, idCapa, arbolCapas);
+            } else {
+                i++;
+            }
+        }
+
+        return true;
+    }
+
+    bool eliminarImagen(int id) {
+        NodoImagen* imagen = buscar(id);
+
+        if (imagen == NULL) {
+            return false;
+        }
+
+        borrarCapasImagen(imagen->primeraCapa);
+
+        if (imagen->siguiente == imagen && imagen->anterior == imagen) {
+            primero = NULL;
+            delete imagen;
+            return true;
+        }
+
+        imagen->anterior->siguiente = imagen->siguiente;
+        imagen->siguiente->anterior = imagen->anterior;
+
+        if (primero == imagen) {
+            primero = imagen->siguiente;
+        }
+
+        delete imagen;
+        return true;
     }
 
     bool cargarArchivo(string ruta, ArbolCapas& arbolCapas) {

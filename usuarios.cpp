@@ -130,6 +130,44 @@ private:
         return numero;
     }
 
+
+    bool eliminarImagenDeLista(NodoUsuario* usuario, int idImagen) {
+        if (usuario == NULL) {
+            return false;
+        }
+
+        NodoImagenUsuario* actual = usuario->primeraImagen;
+        NodoImagenUsuario* anterior = NULL;
+
+        while (actual != NULL) {
+            if (actual->idImagen == idImagen) {
+                if (anterior == NULL) {
+                    usuario->primeraImagen = actual->siguiente;
+                } else {
+                    anterior->siguiente = actual->siguiente;
+                }
+
+                delete actual;
+                return true;
+            }
+
+            anterior = actual;
+            actual = actual->siguiente;
+        }
+
+        return false;
+    }
+
+    void eliminarImagenDeTodosRec(NodoUsuario* actual, int idImagen) {
+        if (actual == NULL) {
+            return;
+        }
+
+        eliminarImagenDeLista(actual, idImagen);
+        eliminarImagenDeTodosRec(actual->izquierda, idImagen);
+        eliminarImagenDeTodosRec(actual->derecha, idImagen);
+    }
+
     void agregarImagenAUsuario(NodoUsuario* usuario, int idImagen, ListaImagenes& listaImagenes) {
         if (usuario == NULL) {
             return;
@@ -586,6 +624,53 @@ public:
 
         borrarListaImagenes(copiaImagenes);
         return false;
+    }
+
+
+    bool agregarImagenAUsuario(string nombre, int idImagen, NodoImagen* imagen) {
+        if (nombre == "" || idImagen <= 0 || imagen == NULL) {
+            return false;
+        }
+
+        NodoUsuario* usuario = buscar(nombre);
+
+        if (usuario == NULL) {
+            return false;
+        }
+
+        if (buscarImagenEnUsuario(usuario, idImagen) != NULL) {
+            return false;
+        }
+
+        NodoImagenUsuario* nueva = new NodoImagenUsuario(idImagen, imagen);
+
+        if (usuario->primeraImagen == NULL) {
+            usuario->primeraImagen = nueva;
+        } else {
+            NodoImagenUsuario* actual = usuario->primeraImagen;
+
+            while (actual->siguiente != NULL) {
+                actual = actual->siguiente;
+            }
+
+            actual->siguiente = nueva;
+        }
+
+        return true;
+    }
+
+    bool eliminarImagenDeUsuario(string nombre, int idImagen) {
+        NodoUsuario* usuario = buscar(nombre);
+
+        if (usuario == NULL) {
+            return false;
+        }
+
+        return eliminarImagenDeLista(usuario, idImagen);
+    }
+
+    void eliminarImagenDeTodos(int idImagen) {
+        eliminarImagenDeTodosRec(raiz, idImagen);
     }
 
     bool graficarArbolUsuarios() {

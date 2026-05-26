@@ -35,6 +35,8 @@ int main() {
         cout << "17. Agregar usuario" << endl;
         cout << "18. Modificar usuario" << endl;
         cout << "19. Eliminar usuario" << endl;
+        cout << "20. Agregar imagen" << endl;
+        cout << "21. Eliminar imagen" << endl;
         cout << "0. Salir" << endl;
         cout << "Seleccione una opcion: ";
         cin >> opcion;
@@ -221,6 +223,60 @@ int main() {
                 } else {
                     cout << "No se pudo eliminar el usuario." << endl;
                     cout << "Revise que el usuario exista." << endl;
+                }
+            } else {
+                cout << "Eliminacion cancelada." << endl;
+            }
+        } else if (opcion == 20) {
+            string nombreUsuario;
+            int idImagen;
+            string capasTexto;
+
+            cout << "Ingrese el usuario al que se le agregara la imagen: ";
+            cin >> nombreUsuario;
+            cout << "Ingrese el id de la nueva imagen: ";
+            cin >> idImagen;
+            cout << "Ingrese las capas separadas por coma. Ejemplo 1,2,3: ";
+            cin >> capasTexto;
+
+            if (listaImagenes.agregarImagenManual(idImagen, capasTexto, arbolCapas)) {
+                NodoImagen* imagenNueva = listaImagenes.buscar(idImagen);
+
+                if (arbolUsuarios.agregarImagenAUsuario(nombreUsuario, idImagen, imagenNueva)) {
+                    cout << "Imagen agregada correctamente." << endl;
+                } else {
+                    listaImagenes.eliminarImagen(idImagen);
+                    cout << "No se pudo agregar la imagen al usuario." << endl;
+                    cout << "Revise que el usuario exista y que no tenga ya esa imagen." << endl;
+                }
+            } else {
+                cout << "No se pudo agregar la imagen." << endl;
+                cout << "Revise que el id no exista y que las capas esten cargadas." << endl;
+            }
+        } else if (opcion == 21) {
+            string nombreUsuario;
+            int idImagen;
+            char confirmar;
+
+            cout << "Ingrese el usuario dueño de la imagen: ";
+            cin >> nombreUsuario;
+            cout << "Ingrese el id de la imagen a eliminar: ";
+            cin >> idImagen;
+            cout << "Seguro que desea eliminar la imagen? s/n: ";
+            cin >> confirmar;
+
+            if (confirmar == 's' || confirmar == 'S') {
+                if (arbolUsuarios.eliminarImagenDeUsuario(nombreUsuario, idImagen)) {
+                    arbolUsuarios.eliminarImagenDeTodos(idImagen);
+
+                    if (listaImagenes.eliminarImagen(idImagen)) {
+                        cout << "Imagen eliminada correctamente." << endl;
+                    } else {
+                        cout << "La imagen se quito del usuario, pero no estaba en la lista circular." << endl;
+                    }
+                } else {
+                    cout << "No se pudo eliminar la imagen." << endl;
+                    cout << "Revise que el usuario exista y que tenga esa imagen." << endl;
                 }
             } else {
                 cout << "Eliminacion cancelada." << endl;
