@@ -104,6 +104,37 @@ private:
     int maxX;
     int maxY;
 
+    int valorHexadecimal(char c) {
+        c = toupper(c);
+
+        if (c >= '0' && c <= '9') {
+            return c - '0';
+        }
+
+        if (c >= 'A' && c <= 'F') {
+            return c - 'A' + 10;
+        }
+
+        return 0;
+    }
+
+    string colorLetra(string color) {
+        if (color.length() < 7) {
+            return "#000000";
+        }
+
+        int rojo = valorHexadecimal(color[1]) * 16 + valorHexadecimal(color[2]);
+        int verde = valorHexadecimal(color[3]) * 16 + valorHexadecimal(color[4]);
+        int azul = valorHexadecimal(color[5]) * 16 + valorHexadecimal(color[6]);
+        int brillo = (rojo * 299 + verde * 587 + azul * 114) / 1000;
+
+        if (brillo < 140) {
+            return "#FFFFFF";
+        }
+
+        return "#000000";
+    }
+
 public:
     MatrizDispersa() {
         maxX = 0;
@@ -274,7 +305,8 @@ public:
             NodoPixel* pixel = fila->acceso;
 
             while (pixel != NULL) {
-                archivo << "p" << pixel->x << "_" << pixel->y << " [label=" << q << "(" << pixel->x << "," << pixel->y << ")\\n" << pixel->color << q << ", fillcolor=" << q << pixel->color << q << ", color=" << q << "#222222" << q << "];" << endl;
+                string colorTexto = colorLetra(pixel->color);
+                archivo << "p" << pixel->x << "_" << pixel->y << " [label=" << q << "(" << pixel->x << "," << pixel->y << ")\\n" << pixel->color << q << ", fillcolor=" << q << pixel->color << q << ", fontcolor=" << q << colorTexto << q << ", color=" << q << "#222222" << q << "];" << endl;
                 pixel = pixel->derecha;
             }
 
