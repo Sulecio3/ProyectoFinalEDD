@@ -378,6 +378,7 @@ int main() {
                 if (arbolCapas.graficarMatrizCapa(id)) {
                     cout << "Matriz dispersa generada correctamente." << endl;
                     cout << "Revise los archivos matriz_capa_" << id << ".dot y matriz_capa_" << id << ".png" << endl;
+                    cout << "Ahora se genera en una sola imagen, sin partes." << endl;
                 } else {
                     cout << "No se pudo generar la matriz dispersa." << endl;
                     cout << "Revise que la capa exista y que primero haya cargado las capas." << endl;

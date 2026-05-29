@@ -620,6 +620,53 @@ public:
         return true;
     }
 
+    // Genera la matriz dispersa de cada capa que tiene una imagen.
+    // Para cada capa con pixeles, llama a graficarEstructura de MatrizDispersa.
+    // Retorna la cantidad de archivos generados (0 si fallo).
+    int graficarMatrizPorImagen(int id, ArbolCapas& arbolCapas) {
+        NodoImagen* imagen = buscar(id);
+
+        if (imagen == NULL) {
+            cout << "No existe la imagen " << id << "." << endl;
+            return 0;
+        }
+
+        NodoCapaImagen* actual = imagen->primeraCapa;
+
+        if (actual == NULL) {
+            cout << "La imagen " << id << " no tiene capas asignadas." << endl;
+            return 0;
+        }
+
+        int generadas = 0;
+        int numeroCapa = 1;
+
+        while (actual != NULL) {
+            if (actual->capa != NULL && actual->capa->matriz.contarPixeles() > 0) {
+                cout << "--- Capa " << actual->idCapa
+                     << " (capa " << numeroCapa << " de la imagen " << id << ") ---" << endl;
+
+                string nombreDot = "matriz_imagen_" + to_string(id)
+                                 + "_capa_" + to_string(actual->idCapa) + ".dot";
+                string nombrePng = "matriz_imagen_" + to_string(id)
+                                 + "_capa_" + to_string(actual->idCapa) + ".png";
+
+                if (actual->capa->matriz.graficarEstructura(nombreDot, nombrePng, actual->idCapa)) {
+                    generadas++;
+                }
+            } else if (actual->capa == NULL) {
+                cout << "Capa " << actual->idCapa << " no encontrada en el ABB, se omite." << endl;
+            } else {
+                cout << "Capa " << actual->idCapa << " no tiene pixeles, se omite." << endl;
+            }
+
+            numeroCapa++;
+            actual = actual->siguiente;
+        }
+
+        return generadas;
+    }
+
 };
 
 #endif
